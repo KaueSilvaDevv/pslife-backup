@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PsLife | Login</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+
+    <link rel="stylesheet" href="../../assets/css/cadastroLogin.css">
+    <link rel="stylesheet" href="../../assets/css/login.css">
+</head>
+
+<body>
+
+    <a href="../../index.html"><i class="fa-solid fa-arrow-left"></i></a>
+
+    <dialog id="cardErro">
+        <p id="errorMensage">Email ou senha errados!</p>
+    </dialog>
+
+    <dialog id="cardSucess">
+        <p>Entrando...</p>
+    </dialog>
+
+    <div id="form">
+        <section id="input_area">
+            <h1>Entre na plataforma</h1>
+            <p>Efetue o Login e tenha acesso a gráficos com dados de nossos players usuários e acesso a ferramenta de
+                organização do tempo</p>
+
+            <div>
+                <input id="email_input" type="text" placeholder="meuemail@provedor.com" />
+
+                <input id="senha_input" type="password" placeholder="Senha" />
+            </div>
+
+            <button class="botao" onclick="entrar()">ENTRAR</button>
+        </section>
+        <!-- <div id="div_aguardar" class="loading-div">
+              <img src="./assets/circle-loading.gif" id="loading-gif" />
+            </div> -->
+
+        <!-- <div id="div_erros_login"></div> -->
+
+        <section id="sideBanner">
+            <h2>Ainda não possui uma conta?</h2>
+            <p>Realize o cadastro clicando no botão abaixo para que assim possa usufruir da dashboard.</p>
+            <button id="signupButton">Cadastre-se</button>
+        </section>
+    </div>
+</body>
+
+</html>
+
+<script>
+    const signupButton = document.querySelector('#signupButton');
+
+    signupButton.addEventListener('click', function () {
+        setTimeout(() => {
+            window.location = "../telaCadastro/cadastro.html";
+        }, "500");
+    })
+
+    function entrar() {
+
+        var emailVar = email_input.value;
+        var senhaVar = senha_input.value;
+        let mensagemErro = '';
+
+        const camposEmBranco = emailVar == "" || senhaVar == "";
+
+        console.log("FORM LOGIN: ", emailVar);
+        console.log("FORM SENHA: ", senhaVar);
+
+        if (camposEmBranco) {
+            mensagemErro = 'Preencha todos os campos!';
+            mostrarMensagemErro(mensagemErro);
+        }
+
+        else {
+
+            fetch("/usuarios/autenticar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    emailServer: emailVar,
+                    senhaServer: senhaVar
+                })
+            }).then(function (resposta) {
+                console.log("ESTOU NO THEN DO entrar()!")
+
+                if (resposta.ok) {
+                    mostrarMensagemSucesso();
+                    console.log(resposta);
+
+                    resposta.json().then(json => {
+                        console.log(json);
+                        console.log(JSON.stringify(json));
+                        sessionStorage.ID_USUARIO = json.id;
+                        sessionStorage.EMAIL_USUARIO = json.email;
+                        sessionStorage.NOME_USUARIO = json.nome;
+                        sessionStorage.ID_VIDEOGAME = json.fkvideogame;
+                        sessionStorage.ID_GENEROFAVORITO = json.fkgeneroFavorito;
+
+
+                        setTimeout(function () {
+                            window.location = "../dashboard/visaoGeral.html";
+                        }, 1000); // apenas para exibir o loading
+
+                    });
+
+
+                } else {
+
+                    console.log("Houve um erro ao tentar realizar o login!");
+                    
+                    mensagemErro = 'Email ou senha errados! Tente novamente.';
+                    mostrarMensagemErro(mensagemErro);
+
+                    resposta.text().then(texto => {
+                        console.error(texto);
+                        // finalizarAguardar(texto);
+                    });
+                }
+
+            }).catch(function (erro) {
+                console.log(erro);
+            })
+        }
+
+
+
+        return false;
+    }
+
+    function mostrarMensagemErro(mensagem) {
+        cardErro.style.display = 'block';
+
+        errorMensage.innerHTML = mensagem;
+
+        setTimeout(() => {
+            removerCard()
+        }, "2200");
+    }
+
+    function mostrarMensagemSucesso() {
+        cardSucess.style.display = 'block';
+
+        setTimeout(() => {
+            removerCard()
+        }, "3000");
+    }
+
+    function removerCard() {
+        cardErro.style.display = 'none';
+        cardSucess.style.display = 'none';
+    }
+
+    /*MEXER AQUI EMBAIXO */
+    function obterDadosGerais() {
+        fetch("/usuarios/autenticar", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then(function (resposta) {
+
+            if (resposta.ok) {
+                console.log(resposta);
+
+                resposta.json().then(json => {
+                    console.log(json);
+                    console.log(JSON.stringify(json));
+                    sessionStorage.ID_USUARIO = json.id;
+                    sessionStorage.EMAIL_USUARIO = json.email;
+                    sessionStorage.NOME_USUARIO = json.nome;
+                    sessionStorage.ID_VIDEOGAME = json.fkvideogame;
+                    sessionStorage.ID_GENEROFAVORITO = json.fkgeneroFavorito;
+
+                    // sessionStorage.VIDEOGAMES = JSON.stringify(json.aquarios)
+
+                    setTimeout(function () {
+                        window.location = "../dashboard/cards.html";
+                    }, 1000); // apenas para exibir o loading
+
+                });
+
+            } else {
+
+                console.log("Houve um erro ao tentar realizar a ação!");
+
+                resposta.text().then(texto => {
+                    console.error(texto);
+                    // finalizarAguardar(texto);
+                });
+            }
+
+        }).catch(function (erro) {
+            console.log(erro);
+        })
+    }
+</script>

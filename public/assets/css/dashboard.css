@@ -1,0 +1,271 @@
+@import url('https://fonts.googleapis.com/css2?family=KoHo:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+
+* {
+  font-family: 'KoHo', sans-serif;
+
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+img {
+  width: 100px;
+  height: 100px;
+}
+
+.dash {
+  width: 80%;
+  position: relative;
+  top: 0;
+  left: 20%;
+  background-color: rgb(17, 24, 77);
+  background-position: center;
+  background-size: contain;
+  height: 100vw;
+  overflow: auto;
+}
+
+.graph {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+#barGraphs {
+  flex-direction: column;
+}
+
+#barGraphs canvas {
+  width: 380px;
+  margin: 0 0 10px 50px;
+}
+
+.graph #graph_dayPeriod {
+  width: 300px;
+}
+
+.graph h3 {
+  color: #ffffff;
+}
+
+
+.tituloGraficos {
+  color: rgb(255, 255, 255);
+  display: flex;
+  justify-content: center;
+}
+
+/* PAGINA DOS GRÁFICOS 2023 */
+.header-left a {
+  text-decoration: none;
+  color: white;
+}
+
+.header-left {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  height: 100vh;
+  width: 20%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  background: linear-gradient(rgb(23, 31, 85), rgb(21, 32, 109));
+}
+
+/* .header-left h1 {
+  color: #ffffff;
+  font-size: 32px;
+} */
+
+.hello {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.hello h3 {
+  color: #ffffff;
+  font-weight: 300;
+  font-size: 1.2rem;
+}
+
+.hello h3 span {
+  font-weight: 800;
+}
+
+.btn-nav {
+  width: 40%;
+  color: white;
+  background-color: rgb(25, 57, 197);
+  border-radius: 5px;
+  text-align: center;
+  padding: 2% 5%;
+  cursor: pointer;
+}
+
+.btn-nav-white {
+  width: 40%;
+  background-color: transparent;
+  border: 3px solid #0988ff;
+  border-radius: 5px;
+  text-align: center;
+  padding: 2% 5%;
+}
+
+.btn-nav-white:hover {
+  transition: 0.5s;
+  color: #ffffff;
+  background-color: #1574f18a;
+  filter: drop-shadow(0 0 10px #1574f1d7) drop-shadow(0 0 10px #1574f1d7);
+}
+
+.btn-nav-white h3 {
+  color: #ffffff;
+  padding: 0;
+  margin: 0;
+}
+
+.btn-nav h3,
+.btn-logout h3 {
+  margin: 0;
+  padding: 0;
+}
+
+.btn-logout {
+  margin: 0;
+  padding: 0;
+  width: 20%;
+  background-color: #000000;
+  color: white;
+  border-radius: 10px;
+  text-align: center;
+  padding: 10px 15px;
+  margin-bottom: 100px;
+  cursor: pointer;
+}
+
+.btn-logout:hover {
+  transition: 0.5s;
+  background-color: #0000008f;
+}
+
+.btn-logout:active {
+  transition: 0.2s;
+  transform: translateX(3px) translateY(3px);
+}
+
+#formButton {
+  display: block;
+  padding: 15px 20px;
+  margin: 20px auto 40px auto;
+  background-color: rgb(42, 105, 223);
+  color: #ffffff;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+#formButton:hover {
+  transition: 0.5s;
+  background-color: #1a3bce;
+  transition: 0.4s;
+}
+
+#formButton:active {
+  transition: 0.4s;
+  transform: translateX(2px) translateY(2px);
+  opacity: 0.6;
+  filter: none;
+}
+
+#myChartCanvas {
+  width: 55% !important;
+  height: 55% !important;
+  margin: 0 auto 0 auto;
+}
+
+dialog {
+  background-color: rgb(72, 105, 212);
+  border-radius: 10px;
+  border-width: 2px;
+}
+
+dialog a {
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+dialog section {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+}
+
+dialog label {
+  margin-bottom: 10px;
+}
+
+dialog input {
+  margin-bottom: 20px;
+  padding: 10px;
+  font-size: 14px;
+  background-color: rgba(29, 70, 206, 0.404);
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  color: #fff;
+}
+
+input::placeholder {
+  color: #ffffffb2;
+}
+
+
+dialog select {
+  margin-bottom: 20px;
+  padding: 10px;
+  font-size: 14px;
+  background-color: rgba(29, 70, 206, 0.404);
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  color: #fff;
+}
+
+option {
+  background-color: #0151ffb2;
+  font-weight: 700;
+}
+
+dialog button {
+  margin: auto;
+  width: fit-content;
+  padding: 15px 60px;
+  background-color: rgb(27, 66, 197);
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  color: #ffffff;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+dialog button:hover {
+  transition: 0.5s;
+  background-color: #0023ec;
+  transition: 0.4s;
+}
+
+dialog button:active {
+  transition: 0.4s;
+  transform: translateX(2px) translateY(2px);
+  opacity: 0.6;
+  filter: none;
+}

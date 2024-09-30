@@ -1,0 +1,75 @@
+header {
+    background-image: url('../img/bannerImg.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+header h1 {
+    position: relative;
+    top: 520px;
+    left: 60px;
+    max-width: 300px;
+    font-size: 1.6rem;
+    text-align: center;
+}
+
+main {
+    padding: 70px;
+}
+
+section {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+section:nth-of-type(2) {
+    margin: 25% 0 25% 0;
+}
+
+section:nth-of-type(3) {
+    margin-bottom: 25%;
+}
+
+article h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    font-style: italic;
+    margin-bottom: 20px;
+}
+
+article p {
+    max-width: 500px;
+    line-height: 1.5;
+    text-indent: 50px;
+    text-align: justify;
+}
+
+section figure {
+    width: 500px;
+    height: 500px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 60%;
+}
+
+section:nth-of-type(1) figure {
+    filter: drop-shadow(-2px 0 50px rgba(38, 220, 90, 0.75)) drop-shadow(-2px 0 50px rgba(38, 220, 90, 0.75));
+    background-image: url('../img/botoesPs/triangulo.png');
+}
+
+section:nth-of-type(2) figure {
+    filter: drop-shadow(-2px 0 50px rgba(216, 53, 53, 0.75)) drop-shadow(-2px 0 50px rgba(216, 53, 53, 0.75));
+    background-image: url('../img/botoesPs/bolinha.png');
+}
+
+section:nth-of-type(3) figure {
+    filter: drop-shadow(-2px 0 50px rgba(53, 93, 238, 0.75)) drop-shadow(-2px 0 50px rgba(53, 93, 238, 0.75));
+    background-image: url('../img/botoesPs/x.png');
+    
+}
+
+section:nth-of-type(4) figure {
+    background-image: url('../img/botoesPs/quadrado.png');
+    filter: drop-shadow(-2px 0 50px rgba(185, 84, 252, 0.75)) drop-shadow(-2px 0 50px rgba(185, 84, 252, 0.75));
+}

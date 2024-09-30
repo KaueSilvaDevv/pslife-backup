@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSLife | Dashboard</title>
+
+    <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../assets/css/kpi.css">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+    <nav class="header-left">
+        <img src="../../assets/img/logo.png" alt="">
+
+        <div class="hello">
+            <h3>Player <span id="b_usuario">usuário</span></h3>
+        </div>
+
+        <div class="btn-nav-white">
+            <a href="./visaoGeral.html">
+                <h3>Visão Geral</h3>
+            </a>
+        </div>
+
+        <div class="btn-nav">
+            <h3>Métrica Pessoal</h3>
+        </div>
+
+        <div class="btn-logout" onclick="voltarAoLogin()">
+            <h3>Sair</h3>
+        </div>
+    </nav>
+
+    <div class="dash">
+        <div id="kpis">
+            <div>
+                <h3>O que você mais faz:</h3>
+                <p id="activity"></p>
+                <p id="hours"><span id="qttHours"></span> horas (<span id="difference"></span> horas a mais que <span
+                    id="otherActivity"></span>)</p>
+                </div>
+                
+                <div>
+                    <h3>Período do dia que mais joga</h3>
+                    <p id="dayPeriod"></p>
+                    <p><span id="dayQtt"></span> dias jogados neste periodo</p>
+                </div>
+                
+                <div>
+                    <h3>Gênero de jogo que mais jogou</h3>
+                    <p id="genreGame"></p>
+                    <p>Jogou <span id="totalHours"></span> dias</p>
+                </div>
+            </div>
+            
+            <h2 class="tituloGraficos">Métricas Pessoais</h2>
+
+            <div class="graphic">
+                <canvas id="myChartCanvas"></canvas>
+            </div>
+        
+
+        <button id="formButton" onclick="modal.showModal()">Formulário Diário</button>
+
+        <dialog id="modal">
+            <a id="closeBtn">X</a>
+            <section>
+                <h1>Formulário Diário</h1>
+
+                <label>Horas de Jogatina:</label>
+
+                <input type="text" name="horasJogo" id="inpt_horasJogo" placeholder="Ex: 2">
+
+                <label>Selecione o Gênero de jogo que mais jogou hoje:</label>
+
+                <select name="listaGenerosJogo" id="select_listaGenerosJogo">
+                    <option value="#">Selecione um gênero</option>
+                </select>
+
+                <label>Selecione o periodo do dia que mais jogou hoje:</label>
+
+                <select name="listaPeriodosDia" id="select_listaPeriodosDia">
+                    <option value="#">Selecione o periodo do dia</option>
+                </select>
+
+                <label>Horas Estudadas:</label>
+
+                <input type="text" name="horasEstudadas" id="inpt_horasEstudadas" placeholder="Ex: 2">
+
+                <button id="btn_submit">Enviar</button>
+            </section>
+
+        </dialog>
+    </div>
+</body>
+
+</html>
+
+<script>
+    b_usuario.innerHTML = sessionStorage.NOME_USUARIO;
+
+    let proximaAtualizacao;
+
+    window.addEventListener('load', listarGenerosJogo);
+    window.addEventListener('load', listarPeriodosDia);
+    window.addEventListener('load', exibirMetricasUsuario);
+
+    const submitButton = document.querySelector('#btn_submit');
+    submitButton.addEventListener('click', cadastrarMetrica);
+
+    const closeButton = document.querySelector('#closeBtn');
+    closeButton.addEventListener('click', function(){
+        modal.close();
+
+        inpt_horasJogo.value = '';
+        inpt_horasEstudadas.value = '';
+        select_listaGenerosJogo.value = '#';
+        select_listaPeriodosDia.value = '#';
+    })
+
+    function voltarAoLogin() {
+        setTimeout(() => {
+            window.location = "../telaLogin/telaLogin.html";
+        }, "500");
+    }
+    
+    function exibirMetricasUsuario() {
+        var idUsuario = JSON.parse(sessionStorage.ID_USUARIO);
+
+        obterDadosGrafico(idUsuario);
+        obterDadosKpis(idUsuario);
+    }
+
+    function exibirMetrica(idUsuario) {
+        obterDadosGrafico(idUsuario);
+    }
+
+    function obterDadosGrafico(idUsuario) {
+        if (proximaAtualizacao != undefined) {
+            clearTimeout(proximaAtualizacao);
+        }
+
+        fetch(`/metricasUsuario/ultimas/${idUsuario}`, { cache: 'no-store' }).then(function (response) {
+            if (response.ok) {
+                response.json().then(function (resposta) {
+                    resposta.reverse();
+                    plotarGrafico(resposta, idUsuario);
+                });
+            } else {
+                console.error('Nenhum dado encontrado ou erro na API');
+            }
+        })
+            .catch(function (error) {
+                console.error(`Erro na obtenção dos dados p/ gráfico: ${error.message}`);
+            });
+    }
+
+    function obterDadosKpis(idUsuario) {
+
+        fetch(`/metricasUsuario/obterKpiPeriodo/${idUsuario}`, { cache: 'no-store' }).then(function (response) {
+            if (response.ok) {
+                response.json().then(function (resposta) {
+                    inserirKpiPeriodoUsuario(resposta);
+                });
+            } else {
+                console.error('Nenhum dado encontrado ou erro na API');
+            }
+        })
+            .catch(function (error) {
+                console.error(`Erro na obtenção dos dados p/ gráfico: ${error.message}`);
+            });
+
+        fetch(`/metricasUsuario/obterKpiGenero/${idUsuario}`, { cache: 'no-store' }).then(function (response) {
+            if (response.ok) {
+                response.json().then(function (resposta) {
+                    inserirKpiGeneroUsuario(resposta);
+                });
+            } else {
+                console.error('Nenhum dado encontrado ou erro na API');
+            }
+        })
+            .catch(function (error) {
+                console.error(`Erro na obtenção dos dados p/ gráfico: ${error.message}`);
+            });
+
+        fetch(`/metricasUsuario/obterKpiAtividade/${idUsuario}`, { cache: 'no-store' }).then(function (response) {
+            if (response.ok) {
+                response.json().then(function (resposta) {
+                    inserirKpiAtividadeUsuario(resposta);
+                });
+            } else {
+                console.error('Nenhum dado encontrado ou erro na API');
+            }
+        })
+            .catch(function (error) {
+                console.error(`Erro na obtenção dos dados p/ gráfico: ${error.message}`);
+            });
+    }
+
+    function plotarGrafico(resposta) {
+        let labels = [];
+        let dados = {
+            labels: labels,
+            datasets: [{
+                label: 'Estudo',
+                data: [],
+                fill: false,
+                borderColor: '#1bf097',
+                tension: 0.1
+            },
+            {
+                label: 'Jogatina',
+                data: [],
+                fill: false,
+                borderColor: '#f08d1b',
+                tension: 0.1
+            }]
+        };
+
+        for (let i = 0; i < resposta.length; i++) {
+            var registro = resposta[i];
+            labels.push(registro.dt_grafico);
+            dados.datasets[0].data.push(registro.hora_estudo);
+            dados.datasets[1].data.push(registro.hora_jogo);
+        }
+
+        const config = {
+            type: 'line',
+            data: dados,
+        };
+
+        let myChart = new Chart(
+            document.getElementById(`myChartCanvas`),
+            config
+        );
+
+    }
+
+    function cadastrarMetrica() {
+        const idUsuarioVar = JSON.parse(sessionStorage.ID_USUARIO);
+        const horasJogoVar = Number(inpt_horasJogo.value);
+        const horasEstudadasVar = Number(inpt_horasEstudadas.value);
+        const generoMaisJogadoDiaVar = select_listaGenerosJogo.value;
+        const periodoJogadoDiaVar = select_listaPeriodosDia.value;
+
+        const somaHoras = horasJogoVar + horasEstudadasVar;
+
+        const qtdHorasInvalidas = somaHoras >= 24;
+
+        if (
+            (horasJogoVar == '' && horasEstudadasVar == '')
+        ) {
+            alert('Um dos campos de hora deve estar preenchido');
+            
+            return false;
+        }
+        else if (qtdHorasInvalidas) {
+            alert('A soma das horas não pode ser maior que 24.')
+        }
+        else if ((generoMaisJogadoDiaVar == '#' || periodoJogadoDiaVar == '#') && horasJogoVar != '') {
+            alert('Todos os campos que envolver jogatina devem estar preenchidos');
+
+            return false;
+        }
+        else {
+            const modal = document.querySelector('#modal');
+
+
+            fetch("/usuarios/cadastrarMetrica", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    idUsuarioServer: idUsuarioVar,
+                    horasJogoServer: horasJogoVar,
+                    horasEstudoServer: horasEstudadasVar,
+                    generoJogadoDiaServer: generoMaisJogadoDiaVar,
+                    periodoJogadoDiaServer: periodoJogadoDiaVar,
+                }),
+            })
+
+            modal.addEventListener('click', modal.close())
+
+                .then(function (resposta) {
+                    console.log("resposta: ", resposta);
+
+                    if (resposta.ok) {
+                        // cardErro.style.display = "block";
+
+                        console.log("Formulário cadastrado com sucesso...");
+
+                        // setTimeout(() => {
+                        //     window.location = "./dashboard.html";
+                        // }, "1500");
+
+                    } else {
+                        throw "Houve um erro ao tentar realizar o envio do formulário!";
+                    }
+                })
+                .catch(function (resposta) {
+                    console.log(`#ERRO: ${resposta}`);
+                    // finalizarAguardar();
+                });
+
+            return false;
+        }
+
+        // Enviando o valor da nova input
+    }
+
+    function listarGenerosJogo() {
+        fetch("/generosJogo/listarGenerosJogo", {
+            method: "GET",
+        })
+            .then(function (resposta) {
+                if (!resposta.ok) {
+                    throw new Error(`Network response was not ok: ${resposta.statusText}`);
+                }
+                resposta.json().then((generosJogo) => {
+                    generosJogo.forEach((generoJogo) => {
+                        select_listaGenerosJogo.innerHTML += `<option value='${generoJogo.id}'>${generoJogo.nome}</option>`;
+                    });
+                });
+            })
+            .catch(function (resposta) {
+                console.log(`#ERRO: ${resposta}`);
+            });
+    }
+
+    function listarPeriodosDia() {
+        fetch("/periodosDia/listarPeriodosDia", {
+            method: "GET",
+        })
+            .then(function (resposta) {
+                if (!resposta.ok) {
+                    throw new Error(`Network response was not ok: ${resposta.statusText}`);
+                }
+                resposta.json().then((periodosDia) => {
+                    periodosDia.forEach((periodoDia) => {
+                        select_listaPeriodosDia.innerHTML += `<option value='${periodoDia.id}'>${periodoDia.nome}</option>`;
+                    });
+                });
+            })
+            .catch(function (resposta) {
+                console.log(`#ERRO: ${resposta}`);
+            });
+    }
+
+    function inserirKpiPeriodoUsuario(resposta) {
+        const periodoDia = resposta[0].periodo.toUpperCase();
+        const qtdDias = resposta[0].qtdSelecionada;
+
+        dayPeriod.innerHTML = periodoDia;
+        dayQtt.innerHTML = qtdDias;
+    }
+
+    function inserirKpiGeneroUsuario(resposta) {
+        const generoJogo = resposta[0].genero.toUpperCase();
+        const horasTotais = resposta[0].qtdSelecionada;
+        genreGame.innerHTML = generoJogo;
+        totalHours.innerHTML = horasTotais;
+    }
+
+    function inserirKpiAtividadeUsuario(resposta) {
+        const atividadeEstudo = Number(resposta[0].totalHoraEstudo);
+        const atividadeJogatina = Number(resposta[0].totalHoraJogada);
+        let activityHigher = '';
+        let activityLower = '';
+        let hoursQtt = '';
+        let differenceHours = 0;
+
+        if (atividadeEstudo > atividadeJogatina) {
+            activityHigher = 'ESTUDO';
+            activityLower = 'jogatina';
+            hoursQtt = atividadeEstudo;
+            differenceHours = atividadeEstudo - atividadeJogatina;
+        } 
+        else if (atividadeEstudo == atividadeJogatina) {
+            activityHigher = 'QTD HORAS IGUAIS';
+            hours.innerHTML = '';
+        }
+        else {
+            activityHigher = 'JOGATINA';
+            activityLower = 'estudo';
+            hoursQtt = atividadeJogatina;
+            differenceHours = atividadeJogatina - atividadeEstudo;
+        }
+
+        activity.innerHTML = activityHigher;
+        otherActivity.innerHTML = activityLower;
+        qttHours.innerHTML = hoursQtt;
+        difference.innerHTML = differenceHours;
+    }
+</script>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+
+  <link rel="stylesheet" href="../../assets/css/cadastroLogin.css">
+
+  <title>PsLife | Cadastro</title>
+
+</head>
+
+<body>
+
+  <a href="../../index.html"><i class="fa-solid fa-arrow-left"></i></a>
+
+  <dialog id="cardErro">
+    <p id="errorMensage"></p>
+  </dialog>
+
+  <dialog id="cardSucess">
+    <p>Cadastro Efetuado com sucesso!</p>
+  </dialog>
+
+  <div id="form">
+
+
+
+    <section id="input_area">
+      <h1>Crie uma conta</h1>
+
+      <div>
+        <input id="nome_input" type="text" placeholder="Seu nome" />
+
+        <select name="videogames" id="listaVideogames">
+          <option selected>Console que possui</option>
+        </select>
+
+      </div>
+
+      <div>
+        <input id="email_input" type="text" placeholder="meuemail@provedor.com" />
+        <p id="erroEmail"></p>
+
+        <select name="generosJogo" id="listaGenerosJogo" class="camp">
+          <option selected>Gênero de jogo favorito</option>
+        </select>
+      </div>
+
+
+      <div id="select">
+        <select name="periodosDia" id="listaPeriodosDia" class="camp">
+          <option selected>Periodo do dia que mais joga</option>
+        </select>
+
+        <input id="senha_input" type="password" placeholder="Senha" />
+      </div>
+
+      <div>
+        <input id="confirmacao_senha_input" type="password" placeholder="Confirmar senha" />
+      </div>
+
+
+      <button class="botao" onclick="cadastrar()">CADASTRAR</button>
+    </section>
+
+    <section id="sideBanner">
+      <h2>Já possui uma conta?</h2>
+      <p>Para voltar a utilizar a dashboard, por favor, clique no botão abaixo e entre na plataforma.</p>
+      <button id="loginButton">Login</button>
+    </section>
+  </div>
+
+</body>
+
+</html>
+
+<script>
+
+  const loginButton = document.querySelector('#loginButton');
+
+  loginButton.addEventListener('click', function () {
+    setTimeout(() => {
+      window.location = "../telaLogin/telaLogin.html";
+    }, "500");
+  })
+
+  window.addEventListener('load', listarVideoGames);
+  window.addEventListener('load', listarGenerosJogo);
+  window.addEventListener('load', listarPeriodosDia);
+
+
+  function cadastrar() {
+
+    const listaCaracteresEspeciais = ['!', '@', '#', '$', '?', '&'];
+
+    const nomeVar = nome_input.value;
+    const emailVar = email_input.value;
+    const videogameVar = listaVideogames.value;
+    const generoFavoritoVar = listaGenerosJogo.value;
+    const periodoDiaVar = listaPeriodosDia.value;
+    const senhaVar = senha_input.value;
+    const confirmacaoSenhaVar = confirmacao_senha_input.value;
+
+    let mensagemErro = '';
+
+    const camposVazios = nomeVar == "" || emailVar == "" ||
+      senhaVar == "" || videogameVar == '#' ||
+      generoFavoritoVar == '#' || periodoDiaVar == '#' || confirmacaoSenhaVar == ''
+      ;
+    const nomeInvalido = nomeVar.length <= 1 || nomeVar.length > 40;
+    const emailInvalido = emailVar.indexOf('@') == -1 || emailVar.indexOf('.com') == -1;
+    const senhasDiferentes = senhaVar != confirmacaoSenhaVar;
+    const tamanhoInvalidoSenha = senhaVar.length < 6;
+
+    let senhaContemNumero = false;
+    let senhaContemCaracterEspecial = false;
+
+    for (let i = 0; i <= 9; i++) {
+      if (senhaVar.indexOf(i) != -1) {
+        senhaContemNumero = true;
+      }
+    }
+
+    for (let i = 0; i <= listaCaracteresEspeciais.length; i++) {
+      const caracterEspecialAtual = listaCaracteresEspeciais[i];
+
+      if (senhaVar.indexOf(caracterEspecialAtual) != -1) {
+        senhaContemCaracterEspecial = true;
+      }
+    }
+
+    if (camposVazios) {
+      mensagemErro = 'Todos os campos devem estar preenchidos!';
+      mostrarMensagemErro(mensagemErro);
+
+    }
+    else if (nomeInvalido) {
+      mensagemErro = 'Nome inválido! Tente novamente.';
+      mostrarMensagemErro(mensagemErro);
+    }
+    else if (emailInvalido) {
+      mensagemErro = 'Formato de email inválido! Tente novamente.';
+      mostrarMensagemErro(mensagemErro);
+    }
+    else if (tamanhoInvalidoSenha) {
+      mensagemErro = 'A senha deve conter no mínimo 6 caracteres';
+      mostrarMensagemErro(mensagemErro);
+    }
+    else if (!senhaContemNumero) {
+      mensagemErro = 'A senha deve conter no mínimo 1 caracter numérico';
+      mostrarMensagemErro(mensagemErro);
+    }
+    else if (!senhaContemCaracterEspecial) {
+      mensagemErro = 'A senha deve conter no mínimo 1 caracter especial';
+      mostrarMensagemErro(mensagemErro);
+    }
+    else if (senhasDiferentes) {
+      mensagemErro = 'As senhas não coincidem! Tente novamente.';
+      mostrarMensagemErro(mensagemErro);
+    }
+    else {
+
+      
+      fetch("/usuarios/cadastrar", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nomeServer: nomeVar,
+          emailServer: emailVar,
+          videogameServer: videogameVar,
+          generoFavoritoServer: generoFavoritoVar,
+          periodoDiaServer: periodoDiaVar,
+          senhaServer: senhaVar
+        }),
+      })
+        .then(function (resposta) {
+          console.log("resposta: ", resposta);
+          
+          if (resposta.ok) {
+            console.log("Cadastro realizado com sucesso! Redirecionando para tela de Login...");
+            
+            mostrarMensagemSucesso();
+            
+            setTimeout(() => {
+              window.location = "../telaLogin/telaLogin.html";
+            }, "500");
+            
+          } else {
+            throw "Houve um erro ao tentar realizar o cadastro!";
+          }
+        })
+        .catch(function (resposta) {
+          console.log(`#ERRO: ${resposta}`);
+        });
+    }
+
+
+
+    return false;
+  }
+
+  function mostrarMensagemErro(mensagem) {
+    cardErro.style.display = 'block';
+
+    errorMensage.innerHTML = mensagem;
+
+    setTimeout(() => {
+      removerCard()
+    }, "2200");
+  }
+  
+  function mostrarMensagemSucesso() {
+    cardSucess.style.display = 'block';
+
+    setTimeout(() => {
+      removerCard()
+    }, "3000");
+  }
+
+  function removerCard() {
+    cardErro.style.display = 'none';
+    cardSucess.style.display = 'none';
+  }
+
+  function listarVideoGames() {
+    fetch("/videogames/listarVideoGames", {
+      method: "GET",
+    })
+      .then(function (resposta) {
+        resposta.json().then((videogames) => {
+          videogames.forEach((videogame) => {
+            listaVideogames.innerHTML += `<option value='${videogame.id}'>${videogame.nome}</option>`;
+          });
+        });
+      })
+      .catch(function (resposta) {
+        console.log(`#ERRO: ${resposta}`);
+      });
+  }
+
+  function listarGenerosJogo() {
+    fetch("/generosJogo/listarGenerosJogo", {
+      method: "GET",
+    })
+      .then(function (resposta) {
+        if (!resposta.ok) {
+          throw new Error(`Network response was not ok: ${resposta.statusText}`);
+        }
+        resposta.json().then((generosJogo) => {
+          generosJogo.forEach((generoJogo) => {
+            listaGenerosJogo.innerHTML += `<option value='${generoJogo.id}'>${generoJogo.nome}</option>`;
+          });
+        });
+      })
+      .catch(function (resposta) {
+        console.log(`#ERRO: ${resposta}`);
+      });
+  }
+
+  function listarPeriodosDia() {
+    fetch("/periodosDia/listarPeriodosDia", {
+      method: "GET",
+    })
+      .then(function (resposta) {
+        if (!resposta.ok) {
+          throw new Error(`Network response was not ok: ${resposta.statusText}`);
+        }
+        resposta.json().then((periodosDia) => {
+          periodosDia.forEach((periodoDia) => {
+            listaPeriodosDia.innerHTML += `<option value='${periodoDia.id}'>${periodoDia.nome}</option>`;
+          });
+        });
+      })
+      .catch(function (resposta) {
+        console.log(`#ERRO: ${resposta}`);
+      });
+  }
+
+</script>

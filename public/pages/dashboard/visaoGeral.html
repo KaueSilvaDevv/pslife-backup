@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <link rel="shortcut icon" href="../assets/icon/favicon2.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaTech | Tempo Real</title>
+
+
+    <link rel="stylesheet" href="../../assets/css/kpi.css">
+    <link rel="stylesheet" href="../../assets/css/dashboard.css">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="header-left dash-header">
+
+        <img src="../../assets/img/logo.png" alt="">
+
+        <div class="hello">
+            <h3>Player <span id="b_usuario">usuário</span></h3>
+        </div>
+
+        <div class="btn-nav">
+            <h3>Visão Geral</h3>
+        </div>
+
+        <div class="btn-nav-white">
+            <a href="./dashboard.html">
+                <h3>Métrica Pessoal</h3>
+            </a>
+        </div>
+
+        <div class="btn-logout" onclick="voltarAoLogin()">
+            <h3>Sair</h3>
+        </div>
+
+    </div>
+
+    <div class="dash">
+        <div id="kpis">
+            <div>
+                <h3>Console mais Popular</h3>
+                <p id="popular_videoGame"></p>
+            </div>
+
+            <div>
+                <h3>Período do dia favorito dos players para jogar</h3>
+                <p id="popular_dayPeriod"></p>
+            </div>
+
+            <div>
+                <h3>Gênero de jogo mais jogado</h3>
+                <p id="popular_genre">GÊNERO</p>
+            </div>
+        </div>
+
+        <div class="graph">
+            <div id="barGraphs">
+                <h3>Consoles que os usuários possuem</h3>
+                <canvas id="graph_popularConsole"></canvas>
+
+                <h3>Gêneros de jogo escolhidos pelos usuários</h3>
+                <canvas id="graph_popularGameGenre"></canvas>
+            </div>
+
+            <div id="graphPie">
+                <h3>Períodos do dia que os usuários jogam</h3>
+                <canvas id="graph_dayPeriod"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>
+
+<script>
+
+    b_usuario.innerHTML = sessionStorage.NOME_USUARIO;
+
+    window.addEventListener('load', obterDadosGraficos);
+    window.addEventListener('load', obterDadosKpis);
+
+    function voltarAoLogin() {
+        setTimeout(() => {
+            window.location = "../telaLogin/telaLogin.html";
+        }, "500");
+    }
+
+    function obterDadosGraficos() {
+        fetch(`/generosJogo/obterGenerosJogo`, { cache: 'no-store' }).then(function (response) {
+            if (response.ok) {
+                response.json().then(function (resposta) {
+                    mostrarGraficoGenerosJogo(resposta);
+                });
+            } else {
+                console.error('Nenhum dado encontrado ou erro na API');
+            }
+        })
+            .catch(function (error) {
+                console.error(`Erro na obtenção dos dados p/ gráfico: ${error.message}`);
+            });
+
+        fetch(`/videogames/obterDadosConsoles`, { cache: 'no-store' }).then(function (response) {
+            if (response.ok) {
+                response.json().then(function (resposta) {
+                    mostrarGraficoConsolesPopulares(resposta);
+                });
+            } else {
+                console.error('Nenhum dado encontrado ou erro na API');
+            }
+        })
+            .catch(function (error) {
+                console.error(`Erro na obtenção dos dados p/ gráfico: ${error.message}`);
+            });
+
+        fetch(`/periodosDia/obterPeriodosDiaPopulares`, { cache: 'no-store' }).then(function (response) {
+            if (response.ok) {
+                response.json().then(function (resposta) {
+                    mostrarGraficoPeriodosDiaPopulares(resposta);
+                });
+            } else {
+                console.error('Nenhum dado encontrado ou erro na API');
+            }
+        })
+            .catch(function (error) {
+                console.error(`Erro na obtenção dos dados p/ gráfico: ${error.message}`);
+            });
+    }
+
+    function obterDadosKpis() {
+        fetch(`/generosJogo/obterKpiGeneroJogo`, { cache: 'no-store' }).then(function (response) {
+            if (response.ok) {
+                response.json().then(function (resposta) {
+                    inserirKpiGeneroJogo(resposta);
+                });
+            } else {
+                console.error('Nenhum dado encontrado ou erro na API');
+            }
+        })
+            .catch(function (error) {
+                console.error(`Erro na obtenção dos dados p/ gráfico: ${error.message}`);
+            });
+
+        fetch(`/videogames/obterKpiVideoGame`, { cache: 'no-store' }).then(function (response) {
+            if (response.ok) {
+                response.json().then(function (resposta) {
+                    inserirKpiVideoGame(resposta);
+                });
+            } else {
+                console.error('Nenhum dado encontrado ou erro na API');
+            }
+        })
+            .catch(function (error) {
+                console.error(`Erro na obtenção dos dados p/ gráfico: ${error.message}`);
+            });
+
+        fetch(`/periodosDia/obterKpiPeriodo`, { cache: 'no-store' }).then(function (response) {
+            if (response.ok) {
+                response.json().then(function (resposta) {
+                    inserirKpiPeriodo(resposta);
+                });
+            } else {
+                console.error('Nenhum dado encontrado ou erro na API');
+            }
+        })
+            .catch(function (error) {
+                console.error(`Erro na obtenção dos dados p/ gráfico: ${error.message}`);
+            });
+    }
+
+    function mostrarGraficoGenerosJogo(resposta) {
+        let labels = [];
+        let dados = {
+            labels: labels,
+            datasets: [{
+                label: 'Vezes Escolhida',
+                data: [],
+                backgroundColor: [
+                    'rgba(38, 220, 90, 0.5)',
+                    'rgba(216, 53, 53, 0.5)',
+                    'rgba(53, 93, 238, 0.5)',
+                    'rgba(185, 84, 252, 0.5)',
+                ],
+                borderColor: [
+                    'rgb(38, 220, 90)',
+                    'rgb(216, 53, 53)',
+                    'rgb(53, 93, 238)',
+                    'rgb(185, 84, 252)',
+                ],
+                borderWidth: 5,
+                hoverOffset: 4
+            },]
+        };
+
+        for (let i = 0; i < resposta.length; i++) {
+            var registro = resposta[i];
+            labels.push(registro.generoJogo);
+            dados.datasets[0].data.push(registro.qtdSelecionado);
+        }
+
+        const config = {
+            type: 'bar',
+            data: dados,
+        };
+
+        let myChart = new Chart(
+            document.getElementById(`graph_popularGameGenre`),
+            config
+        );
+
+        const totalUsuarios = resposta.length;
+
+    }
+
+    function mostrarGraficoConsolesPopulares(resposta) {
+        let labels = [];
+        let dados = {
+            labels: labels,
+            datasets: [{
+                label: 'Vezes escolhido',
+                data: [],
+                backgroundColor: [
+                    'rgba(255, 0, 32, 0.4)',
+                    'rgba(255, 196, 0, 0.4)',
+                    'rgba(0, 174, 160, 0.4)',
+                    'rgba(0, 109, 184, 0.4)',
+                ],
+                borderColor: [
+                    '#df0024',
+                    '#f3c300',
+                    '#00ab9f',
+                    'rgb(0 109 184)',
+                ],
+                borderWidth: 4,
+                hoverOffset: 4
+            },]
+        };
+
+        for (let i = 0; i < resposta.length; i++) {
+            var registro = resposta[i];
+            labels.push(registro.console);
+            dados.datasets[0].data.push(registro.qtdSelecionado);
+        }
+
+        const config = {
+            type: 'bar',
+            data: dados,
+        };
+
+        let myChart = new Chart(
+            document.getElementById(`graph_popularConsole`),
+            config
+        );
+
+    }
+
+    function mostrarGraficoPeriodosDiaPopulares(resposta) {
+        let labels = [];
+        let dados = {
+            labels: labels,
+            datasets: [{
+                label: '',
+                data: [],
+                backgroundColor: [
+                    '#FF8C00',
+                    '#FFFF00',
+                    '#483D8B',
+                    '#00008B',
+                ],
+                hoverOffset: 4
+            },]
+        };
+
+        for (let i = 0; i < resposta.length; i++) {
+            var registro = resposta[i];
+            labels.push(registro.periodo);
+            dados.datasets[0].data.push(registro.qtdSelecionado);
+        }
+
+        const config = {
+            type: 'pie',
+            data: dados,
+        };
+
+        let myChart = new Chart(
+            document.getElementById(`graph_dayPeriod`),
+            config
+        );
+
+    }
+
+    function inserirKpiGeneroJogo(resposta) {
+        const generoPopular = resposta[0].nomeGenero.toUpperCase();
+        popular_genre.innerHTML = generoPopular;
+    }
+
+    function inserirKpiVideoGame(resposta) {
+        const videoGamePopular = resposta[0].videogame.toUpperCase();
+        popular_videoGame.innerHTML = videoGamePopular;
+    }
+
+    function inserirKpiPeriodo(resposta) {
+        const periodoPopular = resposta[0].periodo.toUpperCase();
+        popular_dayPeriod.innerHTML = periodoPopular;
+    }
+</script>

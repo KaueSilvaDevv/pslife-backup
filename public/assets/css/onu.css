@@ -1,0 +1,141 @@
+header {
+    background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)) , url('../img/onu/onuBanner.jpg');
+}
+
+header h1 {
+    text-align: center;
+    top: 50%;
+    position: relative;
+    font-size: 50px;
+}
+
+main {
+    margin-top: 80px;
+}
+
+section {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    margin-bottom: 5%;
+}
+
+section div {
+    width: 380px;
+    height: 350px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    text-align: center;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 60%;
+    padding-bottom: 40px;
+    cursor: pointer;
+}
+
+section div h2 {
+    max-width: 300px;
+}
+
+section:nth-of-type(1) div:nth-of-type(1) {
+    background-color: rgba(77, 159, 56, 0.40);
+    background-image: url('../img/onu/saude.png');
+    
+}
+
+section:nth-of-type(1) div:nth-of-type(2) {
+    background-color: rgba(197, 25, 45, 0.40);
+    background-image: url('../img/onu/educacao.png');
+}
+
+section:nth-of-type(1) div:nth-of-type(3) {
+    background-color: rgba(63, 126, 68, 0.4);
+    background-image: url('../img/onu/mudancaClima.png');
+    background-size: 50%;
+}
+
+section:nth-of-type(2) div:nth-of-type(1) {
+    background-color: rgba(253, 105, 37, 0.40);
+    background-image: url('../img/onu/inovacao.png');
+    background-size: 50%;
+}
+
+section:nth-of-type(2) div:nth-of-type(2) {
+    background-color: rgba(221, 19, 103, 0.40);
+    background-image: url('../img/onu/reducDesiguald.png');
+}
+
+section:nth-of-type(2) div:nth-of-type(3) {
+    background-color: rgba(191, 138, 46, 0.40);
+    background-image: url('../img/onu/prodResponsv.png');
+}
+
+dialog {
+    margin: auto;
+    border-radius: 5px;
+    text-align: justify;
+    max-width: 1100px;
+    line-height: 1.5;
+    text-indent: 20px;
+    border: none;
+    outline: none;
+    
+}
+
+dialog ul {
+    display: flex;
+    flex-direction: column;
+    list-style-type: square;
+    padding: 40px;
+    color: #ffffff;
+}
+
+dialog li {
+    margin-bottom: 10px;
+}
+
+dialog button {
+    margin: auto;
+}
+
+dialog .closeModal {
+    font-weight: bold;
+    position: relative;
+    font-size: 24px;
+    left: 5px;
+    cursor: pointer;
+}
+
+dialog li a  {
+    color: blue;
+    text-decoration: underline;
+}
+
+section:nth-of-type(1) dialog:nth-of-type(1) {
+    background-color: rgb(81, 145, 65);
+}
+
+section:nth-of-type(1) dialog:nth-of-type(2) {
+    background-color: rgb(151, 41, 54);
+}
+
+section:nth-of-type(1) dialog:nth-of-type(3) {
+    background-color: rgb(50, 102, 54);
+}
+
+section:nth-of-type(2) dialog:nth-of-type(1) {
+    background-color: rgb(196, 92, 44);
+}
+
+section:nth-of-type(2) dialog:nth-of-type(2) {
+    background-color: rgb(172, 34, 91);
+}
+
+section:nth-of-type(2) dialog:nth-of-type(3) {
+    background-color: rgb(167, 121, 42);
+}
+
+#modalHealth span {
+    font-weight: bold;
+}
